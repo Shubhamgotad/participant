@@ -9,7 +9,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'pravaah.settings')
 django.setup()
 
 from django.contrib.auth.models import User
-from students.models import Student, Attendance, Result, Notification
+from participantmgmt.models import Student, Attendance, Result, Notification
 from datetime import date, timedelta
 import random
 
