@@ -1,0 +1,29 @@
+{
+  "student_name": "s a",
+  "username": "abc",
+  "email": "ab@gmail.com",
+  "course": "B.Tech CSE",
+  "academic_year": "1st Year",
+  "payment": {
+    "payment_method": "upi",
+    "transaction_id": ""
+  },
+  "documents": [
+    {
+      "document_type": "aadhaar_card",
+      "file_path": "student_documents/abc/aadhaar_card_Screenshot_2026-05-28_103242.png"
+    }
+  ],
+  "submitted_at": "2026-05-28T19:06:44.053881+00:00",
+  "course_snapshot": {
+    "duration": "4 Years",
+    "fees": "Rs. 1,20,000 per year",
+    "description": "A hands-on software engineering track with programming, web development, databases, cloud, and placement-focused labs.",
+    "highlights": [
+      "Full stack labs",
+      "Coding practice",
+      "Placement support"
+    ]
+  },
+  "session_key": "0fp3x0mvu47c4fp8bxfxotib2whorz2s"
+}

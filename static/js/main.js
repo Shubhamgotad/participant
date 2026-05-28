@@ -75,4 +75,129 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
+  // Admission pages: documents and course summary
+  const documentRowsContainer = document.getElementById('documentRows');
+  const addDocumentButton = document.getElementById('addDocumentRow');
+  if (documentRowsContainer) {
+    const updateRowLabels = () => {
+      const rows = Array.from(documentRowsContainer.querySelectorAll('[data-document-row]'));
+      rows.forEach((row, index) => {
+        const rowNumber = row.querySelector('.document-row-number');
+        if (rowNumber) {
+          rowNumber.textContent = `Document ${index + 1}`;
+        }
+      });
+
+      rows.forEach((row) => {
+        const removeButtons = row.querySelectorAll('.remove-document-row');
+        removeButtons.forEach((button) => {
+          button.disabled = rows.length === 1;
+          button.onclick = () => {
+            if (rows.length > 1) {
+              row.remove();
+              updateRowLabels();
+            }
+          };
+        });
+      });
+    };
+
+    const createDocumentRow = () => {
+      const rows = Array.from(documentRowsContainer.querySelectorAll('[data-document-row]'));
+      const templateRow = rows[rows.length - 1];
+      if (!templateRow) {
+        return;
+      }
+
+      const clone = templateRow.cloneNode(true);
+      const nextIndex = rows.length + 1;
+      clone.setAttribute('data-row-index', String(nextIndex));
+
+      const typeField = clone.querySelector('select[name^="document_type_"]');
+      const fileField = clone.querySelector('input[type="file"][name^="document_file_"]');
+      const hint = clone.querySelector('.file-name-hint');
+
+      if (typeField) {
+        typeField.name = `document_type_${nextIndex}`;
+        typeField.value = '';
+      }
+      if (fileField) {
+        fileField.name = `document_file_${nextIndex}`;
+        fileField.value = '';
+      }
+      if (hint) {
+        hint.textContent = 'No file selected';
+      }
+
+      documentRowsContainer.appendChild(clone);
+      updateRowLabels();
+    };
+
+    documentRowsContainer.addEventListener('change', (event) => {
+      const target = event.target;
+      if (target && target.matches('input[type="file"]')) {
+        const hint = target.closest('[data-document-row]')?.querySelector('.file-name-hint');
+        if (hint) {
+          hint.textContent = target.files && target.files.length ? target.files[0].name : 'No file selected';
+        }
+      }
+    });
+
+    if (addDocumentButton) {
+      addDocumentButton.addEventListener('click', createDocumentRow);
+    }
+
+    updateRowLabels();
+  }
+
+  const courseSelect = document.querySelector('#courseSelectionForm select[name="course"]');
+  const courseDataElement = document.getElementById('course-catalog-data');
+  if (courseSelect && courseDataElement) {
+    let courseCatalog = {};
+    try {
+      courseCatalog = JSON.parse(courseDataElement.textContent || '{}');
+    } catch (error) {
+      courseCatalog = {};
+    }
+
+    const setCourseSummary = (courseKey) => {
+      const summary = courseCatalog[courseKey] || null;
+      const titleEl = document.getElementById('courseSummaryTitle');
+      const durationBadge = document.getElementById('courseSummaryDuration');
+      const feesEls = [document.getElementById('courseSummaryFees'), document.getElementById('courseSummaryFeesCard')];
+      const durationEls = [document.getElementById('courseSummaryDurationText'), document.getElementById('courseSummaryDurationCard')];
+      const descriptionEl = document.getElementById('courseSummaryDescription');
+      const highlightTargets = [document.getElementById('courseSummaryHighlights'), document.getElementById('courseSummaryHighlightsCard')];
+
+      if (!summary) {
+        if (titleEl) titleEl.textContent = 'Choose a course';
+        if (durationBadge) durationBadge.textContent = 'Duration';
+        feesEls.forEach((element) => { if (element) element.textContent = 'Select a course'; });
+        durationEls.forEach((element) => { if (element) element.textContent = '---'; });
+        if (descriptionEl) descriptionEl.textContent = 'Course details will appear here once you choose a program.';
+        highlightTargets.forEach((element) => { if (element) element.innerHTML = ''; });
+        return;
+      }
+
+      if (titleEl) titleEl.textContent = courseKey;
+      if (durationBadge) durationBadge.textContent = summary.duration || 'Duration';
+      feesEls.forEach((element) => { if (element) element.textContent = summary.fees || 'To be announced'; });
+      durationEls.forEach((element) => { if (element) element.textContent = summary.duration || '---'; });
+      if (descriptionEl) descriptionEl.textContent = summary.description || '';
+      highlightTargets.forEach((element) => {
+        if (!element) return;
+        element.innerHTML = '';
+        (summary.highlights || []).forEach((item) => {
+          const badge = document.createElement('span');
+          badge.className = 'course-summary-pill';
+          badge.textContent = item;
+          element.appendChild(badge);
+        });
+      });
+    };
+
+    courseSelect.addEventListener('change', () => setCourseSummary(courseSelect.value));
+    setCourseSummary(courseSelect.value);
+  }
+
 });
